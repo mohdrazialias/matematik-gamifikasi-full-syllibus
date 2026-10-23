@@ -1,7 +1,6 @@
 let user = { username: "", baseGrade: 1, level: 1, xp: 0, streak: 0, badges: [] };
 let currentQuizGrade = 1;
 let currentCorrectIndex = 0; 
-let oldLevel = 1;
 
 const availableBadges = [
     "Wira Sifir ⚔️", "Pakar Geometri 📐", "Sifu KSSR 🎓", "Raja Matematik 👑", 
@@ -13,7 +12,6 @@ window.onload = function() {
     if (savedData) {
         user = JSON.parse(savedData);
         if(!user.badges) user.badges = [];
-        oldLevel = user.level;
         updateStatsUI(); 
         showPage('menuPage');
     } else { 
@@ -34,7 +32,6 @@ function registerUser() {
     const grade = document.getElementById('gradeSelect').value;
     if (name === "") { alert("Sila isi nama samaran!"); return; }
     user = { username: name, baseGrade: parseInt(grade), level: 1, xp: 0, streak: 0, badges: [] };
-    oldLevel = 1;
     saveData(); updateStatsUI(); showPage('menuPage');
 }
 
@@ -56,7 +53,7 @@ function updateStatsUI() {
     document.getElementById('barXP').innerText = user.xp;
     document.getElementById('barStreak').innerText = user.streak;
     
-    if(user.badges.length > 0) {
+    if(user.badges && user.badges.length > 0) {
         document.getElementById('badgeDisplay').innerText = "Lencana: " + user.badges[user.badges.length - 1];
     } else {
         document.getElementById('badgeDisplay').innerText = "Lencana: Tiada";
@@ -94,7 +91,7 @@ function openChest() {
 
     let bonusXp = Math.floor(Math.random() * 41) + 10;
     user.xp += bonusXp;
-    document.getElementById('chestRewardText').innerHTML = `Ganjaran:<br><span style="color:#f1c40f; font-size:1.3rem;">\${prizeBadge}</span><br><span style="color:#2ecc71;">+\${bonusXp} XP Bonus!</span>`;
+    document.getElementById('chestRewardText').innerHTML = "Ganjaran:<br><span style='color:#f1c40f; font-size:1.3rem;'>" + prizeBadge + "</span><br><span style='color:#2ecc71;'>+" + bonusXp + " XP Bonus!</span>";
     document.getElementById('closeChestBtn').style.display = "block";
     saveData();
 }
@@ -124,53 +121,42 @@ function generateSyllabusQuestion() {
         if (roll === 0) {
             topic = "Nombor Bulat: Nilai Tempat";
             let n = Math.floor(Math.random() * 80) + 10;
-            let sa = n % 10;
-            let puluh = Math.floor(n / 10);
+            let sa = n % 10; let puluh = Math.floor(n / 10);
             let checkSa = Math.random() > 0.5;
-            qText = `Apakah nilai tempat bagi digit \${checkSa ? sa : puluh} dalam nombor \${n}?`;
-            correctAns = checkSa ? "sa" : "puluh";
-            wrongAnswers = ["ratus", "ribu", "ratus ribu"];
+            qText = "Apakah nilai tempat bagi digit " + (checkSa ? sa : puluh) + " dalam nombor " + n + "?";
+            correctAns = checkSa ? "sa" : "puluh"; wrongAnswers = ["ratus", "ribu", "ratus ribu"];
         } else if (roll === 1) {
             topic = "Pecahan Asas";
             qText = "Sebiji pizza dipotong kepada dua bahagian yang sama besar. Satu bahagian ialah...";
             correctAns = "separuh"; wrongAnswers = ["suku", "tiga perempat", "keseluruhan"];
         } else if (roll === 2) {
             topic = "Wang: Tambah Sen";
-            let w1 = Math.floor(Math.random() * 30) + 10;
-            let w2 = Math.floor(Math.random() * 30) + 5;
-            qText = `Kira jumlah wang ini: \${w1} sen + \${w2} sen = ?`;
-            correctAns = `\${w1 + w2} sen`;
-            wrongAnswers = [`\${w1 + w2 + 10} sen`, `\${w1 + w2 - 5} sen`, `\${w1 + w2 + 4} sen`];
+            let w1 = Math.floor(Math.random() * 30) + 10; let w2 = Math.floor(Math.random() * 30) + 5;
+            qText = "Kira jumlah wang ini: " + w1 + " sen + " + w2 + " sen = ?";
+            correctAns = (w1 + w2) + " sen"; wrongAnswers = [(w1 + w2 + 10) + " sen", (w1 + w2 - 5) + " sen", (w1 + w2 + 4) + " sen"];
         } else {
             topic = "Operasi Asas: Tambah Mudah";
-            let n1 = Math.floor(Math.random() * 9) + 1;
-            let n2 = Math.floor(Math.random() * 9) + 1;
-            qText = `Berapakah \${n1} + \${n2}?`;
-            correctAns = (n1 + n2).toString();
-            wrongAnswers = [(n1+n2+2).toString(), (n1+n2-1).toString(), (n1+n2+1).toString()];
+            let n1 = Math.floor(Math.random() * 9) + 1; let n2 = Math.floor(Math.random() * 9) + 1;
+            qText = "Berapakah " + n1 + " + " + n2 + "?";
+            correctAns = (n1 + n2).toString(); wrongAnswers = [(n1+n2+2).toString(), (n1+n2-1).toString(), (n1+n2+1).toString()];
         }
     } 
     else if (currentQuizGrade === 2) {
         if (roll === 0) {
             topic = "Nombor Bulat: Cerakinan";
-            let p = (Math.floor(Math.random() * 5) + 1) * 100;
-            let pul = (Math.floor(Math.random() * 5) + 1) * 10;
-            let s = Math.floor(Math.random() * 9) + 1;
-            qText = `Cerakin digit bagi \${p + pul + s} ialah \${p} + [ ? ] + \${s}.`;
+            let p = (Math.floor(Math.random() * 5) + 1) * 100; let pul = (Math.floor(Math.random() * 5) + 1) * 10; let s = Math.floor(Math.random() * 9) + 1;
+            qText = "Cerakin digit bagi " + (p + pul + s) + " ialah " + p + " + [ ? ] + " + s + ".";
             correctAns = pul.toString(); wrongAnswers = [(pul/10).toString(), (pul*10).toString(), "0"];
         } else if (roll === 1) {
             topic = "Operasi Asas: Darab";
-            let s = Math.floor(Math.random() * 4) + 2;
-            let m = Math.floor(Math.random() * 8) + 2;
-            qText = `Selesaikan: \${s} × \${m} = ?`;
-            correctAns = (s * m).toString();
-            wrongAnswers = [(s*m+s).toString(), (s*m-1).toString(), (s*m+2).toString()];
+            let s = Math.floor(Math.random() * 4) + 2; let m = Math.floor(Math.random() * 8) + 2;
+            qText = "Selesaikan: " + s + " × " + m + " = ?";
+            correctAns = (s * m).toString(); wrongAnswers = [(s*m+s).toString(), (s*m-1).toString(), (s*m+2).toString()];
         } else {
             topic = "Masa dan Waktu";
             let jam = Math.floor(Math.random() * 10) + 1;
-            qText = `Jarum pendek pada angka \${jam} dan jarum panjang tepat pada angka 12. Pukul berapakah itu?`;
-            correctAns = `Pukul \${jam}:00`;
-            wrongAnswers = [`Pukul \${jam}:30`, `Pukul 12:\${jam}`, "Pukul 12:00"];
+            qText = "Jarum pendek pada angka " + jam + " dan jarum panjang tepat pada angka 12. Pukul berapakah itu?";
+            correctAns = "Pukul " + jam + ":00"; wrongAnswers = ["Pukul " + jam + ":30", "Pukul 12:" + jam, "Pukul 12:00"];
         }
     }
     else if (currentQuizGrade === 3) {
@@ -181,60 +167,56 @@ function generateSyllabusQuestion() {
         } else if (roll === 1) {
             topic = "Wang: Tukar Nilai RM";
             let rm = Math.floor(Math.random() * 5) + 2;
-            qText = `Tukarkan RM\${rm} kepada bentuk unit sen.`;
-            correctAns = `\${rm * 100} sen`; wrongAnswers = [`\${rm * 10} sen`, `\${rm}0 sen`, `\${rm * 1000} sen`];
+            qText = "Tukarkan RM" + rm + " kepada bentuk unit sen.";
+            correctAns = (rm * 100) + " sen"; wrongAnswers = [(rm * 10) + " sen", rm + "0 sen", (rm * 1000) + " sen"];
         } else {
             topic = "Ukuran Panjang: m ke cm";
             let m = Math.floor(Math.random() * 8) + 1;
-            qText = `Sebuah meja berukuran \${m} meter panjang. Tukar kepada unit cm.`;
-            correctAns = `\${m * 100} cm`; wrongAnswers = [`\${m * 10} cm`, `\${m}0 cm`, `\${m * 1000} cm`];
+            qText = "Sebuah meja berukuran " + m + " meter panjang. Tukar kepada unit cm.";
+            correctAns = (m * 100) + " cm"; wrongAnswers = [(m * 10) + " cm", m + "0 cm", (m * 1000) + " cm"];
         }
     }
     else if (currentQuizGrade === 4) {
         if (roll === 0) {
             topic = "Nombor Bulat: Bundar";
-            let ribu = (Math.floor(Math.random() * 5) + 1) * 1000;
-            let n = ribu + Math.floor(Math.random() * 300) + 50;
-            qText = `Bundarkan nombor \${n} kepada ribu yang terdekat.`;
+            let ribu = (Math.floor(Math.random() * 5) + 1) * 1000; let n = ribu + Math.floor(Math.random() * 300) + 50;
+            qText = "Bundarkan nombor " + n + " kepada ribu yang terdekat.";
             correctAns = ribu.toString(); wrongAnswers = [(ribu+1000).toString(), (ribu-1000).toString(), (ribu+500).toString()];
         } else if (roll === 1) {
             topic = "Peratusan";
             let p = (Math.floor(Math.random() * 8) + 1) * 10;
-            qText = `Tukarkan pecahan \${p}/100 kepada bentuk simbol peratus.`;
-            correctAns = `\${p}%`; wrongAnswers = [`0.\${p}%`, `\${p}0%`, `\${p/10}%`];
+            qText = "Tukarkan pecahan " + p + "/100 kepada bentuk simbol peratus.";
+            correctAns = p + "%"; wrongAnswers = ["0." + p + "%", p + "0%", (p/10) + "%"];
         } else {
             topic = "Ruang: Perimeter";
-            let p = Math.floor(Math.random() * 4) + 5;
-            let l = Math.floor(Math.random() * 2) + 2;
-            qText = `Cari perimeter sebuah segi empat tepat dengan panjang \${p}cm dan lebar \${l}cm.`;
-            correctAns = `\${(p*2)+(l*2)} cm`; wrongAnswers = [`\${p*l} cm`, `\${p+l} cm`, `\${p*2+l} cm`];
+            let p = Math.floor(Math.random() * 4) + 5; let l = Math.floor(Math.random() * 2) + 2;
+            qText = "Cari perimeter sebuah segi empat tepat dengan panjang " + p + "cm dan lebar " + l + "cm.";
+            correctAns = ((p*2)+(l*2)) + " cm"; wrongAnswers = [(p*l) + " cm", (p+l) + " cm", (p*2+l) + " cm"];
         }
     }
     else if (currentQuizGrade === 5) {
         if (roll === 0) {
             topic = "Operasi Bergabung";
-            let a = Math.floor(Math.random() * 8) + 10;
-            let b = Math.floor(Math.random() * 4) + 2;
-            let c = Math.floor(Math.random() * 4) + 1;
-            qText = `Hitung mengikut tertib BODMAS: \${a} + \${b} × \${c} = ?`;
+            let a = Math.floor(Math.random() * 8) + 10; let b = Math.floor(Math.random() * 4) + 2; let c = Math.floor(Math.random() * 4) + 1;
+            qText = "Hitung mengikut tertib BODMAS: " + a + " + " + b + " × " + c + " = ?";
             correctAns = (a + (b * c)).toString(); wrongAnswers = [((a+b)*c).toString(), (a+b+c).toString(), (a-(b*c)).toString()];
         } else if (roll === 1) {
             topic = "Perpuluhan: Pendaraban";
             let d = (Math.random() * 3 + 1).toFixed(2);
-            qText = `Berapakah hasil bagi nilai \${d} × 100?`;
+            qText = "Berapakah hasil bagi nilai " + d + " × 100?";
             correctAns = (parseFloat(d) * 100).toFixed(0); wrongAnswers = [(parseFloat(d)*10).toFixed(1), "100", "0"];
         } else {
             topic = "Jisim: Penukaran kg ke g";
             let kg = Math.floor(Math.random() * 4) + 2;
-            qText = `Tukarkan \${kg} kg 500 g kepada satu unit gram (g) sahaja.`;
-            correctAns = `\${(kg * 1000) + 500} g`; wrongAnswers = [`\${kg}500 g`, `\${kg * 100 + 500} g`, `\${kg}000 g`];
+            qText = "Tukarkan " + kg + " kg 500 g kepada satu unit gram (g) sahaja.";
+            correctAns = ((kg * 1000) + 500) + " g"; wrongAnswers = [kg + "500 g", (kg * 100 + 500) + " g", kg + "000 g"];
         }
     }
     else {
         if (roll === 0) {
             topic = "Nisbah KSSR";
             let n = Math.floor(Math.random() * 3) + 2;
-            qText = `Nisbah pensel kepada pemadam ialah 1:2. Jika terdapat \${n} pensel, berapakah bilangan pemadam?`;
+            qText = "Nisbah pensel kepada pemadam ialah 1:2. Jika terdapat " + n + " pensel, berapakah bilangan pemadam?";
             correctAns = (n * 2).toString(); wrongAnswers = [n.toString(), (n+2).toString(), (n*3).toString()];
         } else if (roll === 1) {
             topic = "Kebolehjadian";
@@ -243,7 +225,7 @@ function generateSyllabusQuestion() {
         } else {
             topic = "Statistik: Mod";
             let m = Math.floor(Math.random() * 4) + 3;
-            qText = `Apakah nilai 'Mod' bagi set data skor ini: \${m}, 2, 8, \${m}, 5, \${m}, 9?`;
+            qText = "Apakah nilai 'Mod' bagi set data skor ini: " + m + ", 2, 8, " + m + ", 5, " + m + ", 9?";
             correctAns = m.toString(); wrongAnswers = ["2", "8", "9"];
         }
     }
@@ -258,7 +240,7 @@ function generateSyllabusQuestion() {
     }
 
     currentCorrectIndex = allOptions.indexOf(correctAns);
-
+    
     document.getElementById('optA').innerText = "A) " + allOptions[0];
     document.getElementById('optB').innerText = "B) " + allOptions[1];
     document.getElementById('optC').innerText = "C) " + allOptions[2];
@@ -288,7 +270,7 @@ function checkAnswer(selectedIndex) {
         document.getElementById(btnIds[selectedIndex]).style.background = "#2ecc71";
         document.getElementById(btnIds[selectedIndex]).style.borderColor = "#2ecc71";
         feedback.className = "feedback success";
-        feedback.innerText = `Tepat Sekali! 🎉 (+ \${xpGained} XP)`;
+        feedback.innerText = "Tepat Sekali! 🎉 (+" + xpGained + " XP)";
     } else {
         user.streak = 0;
         document.getElementById(btnIds[selectedIndex]).style.background = "#e74c3c";
@@ -296,7 +278,7 @@ function checkAnswer(selectedIndex) {
         document.getElementById(btnIds[currentCorrectIndex]).style.background = "#2ecc71";
         document.getElementById(btnIds[currentCorrectIndex]).style.borderColor = "#2ecc71";
         feedback.className = "feedback error";
-        feedback.innerText = `Kurang tepat!`;
+        feedback.innerText = "Kurang tepat!";
     }
 
     updateStatsUI();
