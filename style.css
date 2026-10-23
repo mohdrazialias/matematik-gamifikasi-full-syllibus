@@ -1,0 +1,145 @@
+:root {
+    --primary: #4a90e2;
+    --secondary: #2ecc71;
+    --accent: #f1c40f;
+    --danger: #e74c3c;
+    --dark: #2c3e50;
+    --light: #f8f9fa;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e0eafc, #cfdef3);
+    margin: 0;
+    padding: 20px;
+    color: var(--dark);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+h1, h2, h3 { text-align: center; margin-top: 0; }
+h1 { color: var(--primary); font-size: 2rem; }
+
+.profile-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--dark);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.stats-grid { display: flex; gap: 15px; font-weight: bold; }
+.stat-item { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; }
+
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: bold; }
+input[type="text"], select {
+    width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+}
+
+button {
+    width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; color: white; transition: transform 0.1s, background 0.2s;
+}
+button:active { transform: scale(0.98); }
+.btn-primary { background-color: var(--primary); }
+.btn-secondary { background-color: var(--secondary); }
+.btn-danger { background-color: var(--danger); }
+
+.grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+.grid-menu button { padding: 20px; font-size: 1.2rem; background: white; color: var(--primary); border: 2px solid var(--primary); }
+.grid-menu button:hover { background: var(--primary); color: white; }
+
+.topic-indicator {
+    text-align: center; font-size: 0.9rem; background: #e8f4fd; color: var(--primary); padding: 6px; border-radius: 5px; font-weight: bold; margin-bottom: 10px;
+}
+
+.question-box {
+    font-size: 1.5rem; text-align: center; margin: 20px 0; font-weight: bold; background: var(--light); padding: 25px; border-radius: 10px; border: 2px dashed var(--primary); min-height: 60px; display: flex; align-items: center; justify-content: center;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+.option-btn {
+    background: #ffffff;
+    color: var(--dark);
+    border: 2px solid #ddd;
+    padding: 15px;
+    font-size: 1.1rem;
+    text-align: left;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+}
+.option-btn:hover:not([disabled]) {
+    background: #f0f4f8;
+    border-color: var(--primary);
+}
+
+.feedback { text-align: center; font-weight: bold; font-size: 1.2rem; margin: 15px 0; min-height: 25px; }
+.feedback.success { color: var(--secondary); }
+.feedback.error { color: var(--danger); }
+
+.chest-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.chest-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.chest-icon {
+    font-size: 5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: inline-block;
+    margin: 20px 0;
+}
+.chest-icon:hover { transform: scale(1.1) rotate(5deg); }
+
+.badge-list {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: #555;
+    text-align: left;
+    background: #f0f4f8;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+@keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.nav-links { display: flex; gap: 10px; margin-top: 15px; }
+footer { text-align: center; margin-top: 40px; font-size: 0.85rem; color: #7f8c8d; }
