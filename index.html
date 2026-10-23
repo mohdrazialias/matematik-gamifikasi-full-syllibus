@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathQuest: Gamifikasi Silibus Penuh KSSR (Darjah 1-6)</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #2ecc71;
+            --accent: #f1c40f;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            margin: 0;
+            padding: 20px;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3 { text-align: center; margin-top: 0; }
+        h1 { color: var(--primary); font-size: 2rem; }
+
+        .profile-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--dark);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stats-grid { display: flex; gap: 15px; font-weight: bold; }
+        .stat-item { background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], select {
+            width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+        }
+
+        button {
+            width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; color: white; transition: transform 0.1s, background 0.2s;
+        }
+        button:active { transform: scale(0.98); }
+        .btn-primary { background-color: var(--primary); }
+        .btn-secondary { background-color: var(--secondary); }
+        .btn-danger { background-color: var(--danger); }
+
+        .grid-menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+        .grid-menu button { padding: 20px; font-size: 1.2rem; background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .grid-menu button:hover { background: var(--primary); color: white; }
+
+        .topic-indicator {
+            text-align: center; font-size: 0.9rem; background: #e8f4fd; color: var(--primary); padding: 6px; border-radius: 5px; font-weight: bold; margin-bottom: 10px;
+        }
+
+        .question-box {
+            font-size: 1.8rem; text-align: center; margin: 20px 0; font-weight: bold; background: var(--light); padding: 25px; border-radius: 10px; border: 2px dashed var(--primary); min-height: 60px; display: flex; align-items: center; justify-content: center;
+        }
+
+        .feedback { text-align: center; font-weight: bold; font-size: 1.2rem; margin: 15px 0; min-height: 25px; }
+        .feedback.success { color: var(--secondary); }
+        .feedback.error { color: var(--danger); }
+
+        .nav-links { display: flex; gap: 10px; margin-top: 15px; }
+        footer { text-align: center; margin-top: 40px; font-size: 0.85rem; color: #7f8c8d; }
+
+        /* Style Baru Untuk Treasure Chest */
+        .badge-list {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .badge-item {
+            background: var(--accent);
+            color: var(--dark);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .chest-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .chest-modal {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            animation: popUp 0.3s ease-out;
+        }
+        .chest-icon {
+            font-size: 5rem;
+            cursor: pointer;
+            margin: 20px 0;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .chest-icon:hover {
+            transform: scale(1.1);
+        }
+        .chest-icon.open {
+            animation: none;
+        }
+        @keyframes popUp {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- STATUS BAR -->
+    <div id="statusTopBar" class="profile-section" style="display: none;">
+        <div>
+            <div>👤 <span id="barUsername" style="font-weight: bold;">Pemain</span> (<span id="barGrade">D1</span>)</div>
+            <div id="badgesContainer" class="badge-list"></div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-item">🏆 Lvl <span id="barLevel">1</span></div>
+            <div class="stat-item">✨ XP: <span id="barXP">0</span></div>
+            <div class="stat-item">🔥 Streak: <span id="barStreak">0</span></div>
+        </div>
+    </div>
+
+    <!-- 1. HALAMAN DAFTAR -->
+    <div id="authPage" class="card">
+        <h1>📐 MathQuest KSSR 🚀</h1>
+        <h2>Profil Pengembara Matematik</h2>
+        <div class="form-group">
+            <label for="usernameInput">Nama Samaran Pemain:</label>
+            <input type="text" id="usernameInput" placeholder="Taip nama anda...">
+        </div>
+        <div class="form-group">
+            <label for="gradeSelect">Pilih Darjah:</label>
+            <select id="gradeSelect">
+                <option value="1">Darjah 1 (Silabus Asas)</option>
+                <option value="2">Darjah 2 (Nombor & Sifir Awal)</option>
+                <option value="3">Darjah 3 (Masa, Wang & Pecahan)</option>
+                <option value="4">Darjah 4 (Peratus & Menganggar)</option>
+                <option value="5">Darjah 5 (Operasi Bergabung & Perpuluhan)</option>
+                <option value="6">Darjah 6 (Nisbah, Kebolehjadian & Koordinat)</option>
+            </select>
+        </div>
+        <button class="btn-primary" onclick="registerUser()">Mula Bermain!</button>
+    </div>
+
+    <!-- 2. HALAMAN MENU UTAMA -->
+    <div id="menuPage" class="card" style="display: none;">
+        <h2>Zon Silabus Kebangsaan</h2>
+        <p style="text-align:center;">Pilih zon mengikut tahap pembelajaran anda untuk mengumpul XP:</p>
+        <div class="grid-menu">
+            <button onclick="startQuiz(1)">Darjah 1</button>
+            <button onclick="startQuiz(2)">Darjah 2</button>
+            <button onclick="startQuiz(3)">Darjah 3</button>
+            <button onclick="startQuiz(4)">Darjah 4</button>
+            <button onclick="startQuiz(5)">Darjah 5</button>
+            <button onclick="startQuiz(6)">Darjah 6</button>
+        </div>
+        <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;">
+        <button class="btn-danger" onclick="resetGame()">Reset & Padam Data</button>
+    </div>
+
+    <!-- 3. HALAMAN KUIZ ARENA -->
+    <div id="quizPage" class="card" style="display: none;">
+        <h2 id="quizTitle">Zon Kuiz</h2>
+        <div id="topicText" class="topic-indicator">Topik: Membaca Nombor</div>
+        <div class="question-box" id="questionText">Loading...</div>
+        
+        <div class="form-group">
+            <input type="text" id="answerInput" placeholder="Taip jawapan anda di sini..." autocomplete="off">
+        </div>
+        
+        <div id="feedbackText" class="feedback"></div>
+        <button class="btn-secondary" id="submitBtn" onclick="checkAnswer()">Hantar Jawapan</button>
+        
+        <div class="nav-links">
+            <button class="btn-primary" style="background-color:#7f8c8d;" onclick="goBackMenu()">↩ Menu Utama</button>
+        </div>
+    </div>
+
+    <!-- MODAL TREASURE CHEST -->
+    <div id="chestOverlay" class="chest-overlay" style="display: none;">
+        <div class="chest-modal">
+            <h2 style="color: var(--accent); margin: 0;">🎉 TAHAP BARU DICAPAI! 🎉</h2>
+            <p>Anda telah meningkat ke Level <span id="modalLevelText">2</span>!</p>
+            <p>Sila klik pada peti di bawah untuk menuntut ganjaran anda:</p>
+            <div id="chestIcon" class="chest-icon" onclick="openChest()">📦</div>
+            <div id="chestRewardText" style="font-weight: bold; font-size: 1.2rem; color: var(--secondary); margin-top: 10px;"></div>
+            <button id="closeChestBtn" class="btn-primary" style="display: none; margin-top: 15px;" onclick="closeChestModal()">Teruskan Pengembaraan</button>
+        </div>
+    </div>
+
+    <footer>MathQuest © 2026 - Integrasi Silabus Penuh KSSR Sekolah Rendah</footer>
+</div>
+
+<script>
+    let user = { username: "", baseGrade: 1, level: 1, xp: 0, streak: 0, badges: [] };
+    let currentQuizGrade = 1;
+    let currentCorrectAnswer = "";
+    let previousLevel = 1;
+
+    const availableBadges = [
+        "Wira Sifir", "Pakar Geometri", "Raja Matematik", "Sifu KSSR", 
+        "Penjelajah Nombor", "Juara Pecahan", "Adiwira MathQuest", "Bintang KSSR"
+    ];
+
+    window.onload = function() {
+        const savedData = localStorage.getItem('mathQuest_kssr_user');
+        if (savedData) {
+            user = JSON.parse(savedData);
+            if (!user.badges) user.badges = [];
+            previousLevel = Math.floor(user.xp / 100) + 1;
+            updateStatsUI(); showPage('menuPage');
+        } else { showPage('authPage'); }
+    };
+
+    function showPage(pageId) {
+        document.getElementById('authPage').style.display = pageId === 'authPage' ? 'block' : 'none';
+        document.getElementById('menuPage').style.display = pageId === 'menuPage' ? 'block' : 'none';
+        document.getElementById('quizPage').style.display = pageId === 'quizPage' ? 'block' : 'none';
+        document.getElementById('statusTopBar').style.display = pageId === 'authPage' ? 'none' : 'flex';
+    }
+
+    function registerUser() {
+        const name = document.getElementById('usernameInput').value.trim();
+        const grade = document.getElementById('gradeSelect').value;
+        if (name === "") { alert("Sila isi nama!"); return; }
+        user = { username: name, baseGrade: parseInt(grade), level: 1, xp: 0, streak: 0, badges: [] };
+        previousLevel = 1;
+        saveData(); updateStatsUI(); showPage('menuPage');
+    }
+
+    function saveData() { localStorage.setItem('mathQuest_kssr_user', JSON.stringify(user)); }
+    
+    function updateStatsUI() {
+        let currentLevel = Math.floor(user.xp / 100) + 1;
+        
+        // Pemicu Peti Harta Karun Semasa Naik Level
+        if (currentLevel > previousLevel) {
+            triggerTreasureChest(currentLevel);
+            previousLevel = currentLevel;
+        }
+
+        user.level = currentLevel;
+        saveData();
+
+        document.getElementById('barUsername').innerText = user.username;
+        document.getElementById('barGrade').innerText = "D" + user.baseGrade;
+        document.getElementById('barLevel').innerText = user.level;
+        document.getElementById('barXP').innerText = user.xp;
+        document.getElementById('barStreak').innerText = user.streak;
+
+        // Kemaskini senarai lencana profil
+        const badgesContainer = document.getElementById('badgesContainer');
+        badgesContainer.innerHTML = "";
+        user.badges.forEach(b => {
+            const span = document.createElement('span');
+            span.className = 'badge-item';
+            span.innerText = "🏅 " + b;
+            badgesContainer.appendChild(span);
+        });
+    }
+
+    // Fungsi Pengendalian Treasure Chest
+    function triggerTreasureChest(newLevel) {
+        document.getElementById('modalLevelText').innerText = newLevel;
+        document.getElementById('chestIcon').innerText = "📦";
+        document.getElementById('chestRewardText').innerText = "";
+        document.getElementById('closeChestBtn').style.display = "none";
+        document.getElementById('chestOverlay').style.display = "flex";
+    }
+
+    function openChest() {
+        const chestIcon = document.getElementById('chestIcon');
+        if (chestIcon.innerText === "🎁") return; // Dah buka
+
+        chestIcon.innerText = "🎁";
+        
+        // Pilih lencana secara rawak yang belum dimiliki
+        let unownedBadges = availableBadges.filter(b => !user.badges.includes(b));
+        let rewardBadge = "";
+        if (unownedBadges.length > 0) {
+            rewardBadge = unownedBadges[Math.floor(Math.random() * unownedBadges.length)];
+            user.badges.push(rewardBadge);
+        } else {
+            rewardBadge = "Pingat Emas MathQuest";
+            if (!user.badges.includes(rewardBadge)) user.badges.push(rewardBadge);
+        }
+
+        // Bonus XP Rawak
+        let bonusXP = Math.floor(Math.random() * 41) + 10; // +10 hingga +50 XP
+        user.xp += bonusXP;
+
+        document.getElementById('chestRewardText').innerHTML = `Ganjaran Anda:<br>🏅 Lencana: ${rewardBadge}<br>✨ Bonus: +${bonusXP} XP!`;
+        document.getElementById('closeChestBtn').style.display = "block";
+        
+        // Simpan peningkatan data selepas buka peti tanpa pemicu berulang
+        let currentLevel = Math.floor(user.xp / 100) + 1;
+        user.level = currentLevel;
+        previousLevel = currentLevel; 
+        saveData();
+    }
+
+    function closeChestModal() {
+        document.getElementById('chestOverlay').style.display = "none";
+        updateStatsUI();
+    }
+
+    function startQuiz(grade) {
+        currentQuizGrade = grade;
+        document.getElementById('quizTitle').innerText = "Cabaran Darjah " + grade;
+        generateSyllabusQuestion();
+        showPage('quizPage');
+        document.getElementById('answerInput').focus();
+    }
+
+    // PENGJANA SOALAN BERASASKAN SILIBUS PENUH KSSR (D1 - D6)
+    function generateSyllabusQuestion() {
+        document.getElementById('feedbackText').className = "feedback";
+        document.getElementById('feedbackText').innerText = "";
+        document.getElementById('answerInput').value = "";
+        document.getElementById('submitBtn').style.display = "block";
+
+        let qText = "";
+        let topic = "";
+        let roll = Math.floor(Math.random() * 3);
+
+        switch(currentQuizGrade) {
+            case 1:
+                if (roll === 0) {
+                    topic = "Nombor Bulat: Nilai Tempat";
+                    let n = Math.floor(Math.random() * 80) + 10;
+                    qText = `Apakah nilai tempat bagi digit ${n.toString()[1]} dalam nombor ${n}? (sa / puluh)`;
+                    currentCorrectAnswer = "sa";
+                } else if (roll === 1) {
+                    topic = "Pecahan Asas";
+                    qText = "Satu perdua daripada satu bulatan penuh dipanggil setengah atau ... ? (suku / separuh)";
+                    currentCorrectAnswer = "separuh";
+                } else {
+                    topic = "Wang: Tambah Sen";
+                    let w1 = Math.floor(Math.random() * 40) + 10;
+                    let w2 = Math.floor(Math.random() * 40) + 5;
+                    qText = `${w1} sen + ${w2} sen = ? sen`;
+                    currentCorrectAnswer = (w1 + w2).toString();
+                }
+                break;
+
+            case 2:
+                if (roll === 0) {
+                    topic = "Nombor Bulat: Cerakinan";
+                    let n = Math.floor(Math.random() * 800) + 100;
+                    let p = Math.floor(n/100)*100;
+                    let s = n % 10;
+                    let pul = n - p - s;
+                    qText = `Lengkapkan: ${n} = ${p} + ? + ${s}`;
+                    currentCorrectAnswer = pul.toString();
+                } else if (roll === 1) {
+                    topic = "Sifir & Darab Ringkas";
+                    let s = Math.floor(Math.random() * 4) + 2;
+                    let m = Math.floor(Math.random() * 9) + 1;
+                    qText = `${s} × ${m} = ?`;
+                    currentCorrectAnswer = (s * m).toString();
+                } else {
+                    topic = "Masa dan Waktu";
+                    qText = "Pukul berapakah jika jarum pendek pada angka 3 dan jarum panjang pada angka 12? (Tulis angka jam sahaja, cth: 3)";
+                    currentCorrectAnswer = "3";
+                }
+                break;
+
+            case 3:
+                if (roll === 0) {
+                    topic = "Pecahan Setara";
+                    qText = "Apakah pengangka bagi pecahan setara ini: 1/2 = ?/4";
+                    currentCorrectAnswer = "2";
+                } else if (roll === 1) {
+                    topic = "Perpuluhan dan Sen";
+                    let RM = Math.floor(Math.random() * 5) + 2;
+                    qText = `Tukarkan RM${RM} kepada bentuk sen: ? sen`;
+                    currentCorrectAnswer = (RM * 100).toString();
+                } else {
+                    topic = "Ukuran: Tukar Unit Panjang";
+                    let m = Math.floor(Math.random() * 8) + 1;
+                    qText = `${m} m = ? cm`;
+                    currentCorrectAnswer = (m * 100).toString();
+                }
+                break;
+
+            case 4:
+                if (roll === 0) {
+                    topic = "Nombor Bulat: Bundarkan";
+                    let n = Math.floor(Math.random() * 8000) + 1000;
+                    let ans = Math.round(n / 1000) * 1000;
+                    qText = `Bundarkan nombor ${n} kepada ribu terdekat.`;
+                    currentCorrectAnswer = ans.toString();
+                } else if (roll === 1) {
+                    topic = "Peratusan";
+                    let p = Math.floor(Math.random() * 90) + 5;
+                    qText = `Tukarkan pecahan ${p}/100 kepada bentuk peratus. (Tulis nombor sahaja tanpa simbol %)`;
+                    currentCorrectAnswer = p.toString();
+                } else {
+                    topic = "Ruang: Perimeter Segi Empat";
+                    let p = Math.floor(Math.random() * 6) + 4;
+                    let l = Math.floor(Math.random() * 3) + 2;
+                    qText = `Cari perimeter segi empat tepat yang mempunyai panjang ${p}cm dan lebar ${l}cm. (cm)`;
+                    currentCorrectAnswer = ((p*2) + (l*2)).toString();
+                }
+                break;
+
+            case 5:
+                if (roll === 0) {
+                    topic = "Operasi Bergabung (BODMAS)";
+                    let a = Math.floor(Math.random() * 10) + 10;
+                    let b = Math.floor(Math.random() * 5) + 2;
+                    let c = Math.floor(Math.random() * 5) + 1;
+                    qText = `Hitung nilai bagi: ${a} + ${b} × ${c} = ?`;
+                    currentCorrectAnswer = (a + (b * c)).toString();
+                } else if (roll === 1) {
+                    topic = "Perpuluhan: Pendaraban";
+                    let d = (Math.random() * 5 + 1).toFixed(1);
+                    qText = `Berapakah hasil bagi ${d} × 10?`;
+                    currentCorrectAnswer = (Math.round(parseFloat(d) * 10)).toString();
+                } else {
+                    topic = "Jisim & Isipadu Cecair";
+                    let kg = Math.floor(Math.random() * 5) + 2;
+                    qText = `${kg} kg 500 g = ? g`;
+                    currentCorrectAnswer = ((kg * 1000) + 500).toString();
+                }
+                break;
+
+            case 6:
+                if (roll === 0) {
+                    topic = "Nisbah dan Kadaran";
+                    let n1 = Math.floor(Math.random() * 3) + 1;
+                    let n2 = n1 * 3;
+                    qText = `Nisbah epal kepada oren ialah 1:3. Jika bilangan epal ialah ${n1}, berapakah bilangan oren?`;
+                    currentCorrectAnswer = n2.toString();
+                } else if (roll === 1) {
+                    topic = "Kebolehjadian (Probability)";
+                    qText = "Apakah kebolehjadian matahari terbit dari arah barat esok hari? (mustahil / pasti / sama kemungkinan)";
+                    currentCorrectAnswer = "mustahil";
+                } else {
+                    topic = "Pengurusan Data: Mod & Median";
+                    qText = "Diberi set data skor: 2, 5, 5, 7, 9. Apakah nilai 'Mod' bagi data tersebut?";
+                    currentCorrectAnswer = "5";
+                }
+                break;
+        }
+
+        document.getElementById('topicText').innerText = "Topik: " + topic;
+        document.getElementById('questionText').innerText = qText;
+    }
+
+    function checkAnswer() {
+        const inputElement = document.getElementById('answerInput');
+        const userAnswer = inputElement.value.trim().toLowerCase();
+        const feedback = document.getElementById('feedbackText');
+
+        if (userAnswer === "") { alert("Sila masukkan jawapan!"); return; }
+
+        if (userAnswer === currentCorrectAnswer.toLowerCase()) {
+            user.streak += 1;
+            let xpGained = (currentQuizGrade * 15) + (user.streak > 3 ? 10 : 0);
+            user.xp += xpGained;
+            feedback.className = "feedback success";
+            feedback.innerText = `Tepat sekali! 🌟 (+${xpGained} XP)`;
+            document.getElementById('submitBtn').style.display = "none";
+            updateStatsUI();
+            setTimeout(generateSyllabusQuestion, 1800);
+        } else {
+            user.streak = 0;
+            feedback.className = "feedback error";
+            feedback.innerText = `Kurang tepat. Jawapan betul: ${currentCorrectAnswer}`;
+            updateStatsUI();
+        }
+    }
+
+    document.getElementById('answerInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') { checkAnswer(); }
+    });
+
+    function goBackMenu() { showPage('menuPage'); }
+    
+    function resetGame() {
+        if (confirm("Set semula semua profil dan skor?")) {
+            localStorage.removeItem('mathQuest_kssr_user');
+            showPage('authPage');
+            document.getElementById('usernameInput').value = "";
+        }
+    }
+</script>
+</body>
+</html>
